@@ -1,35 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import { getWorkItems } from './services/api';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [workItems, setWorkItems] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    getWorkItems()
+      .then(setWorkItems)
+      .catch((err) => setError(err.message));
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="container">
+      <h1>WorkFlow Lite</h1>
+
+      {error && <p className="error">{error}</p>}
+
+      <ul className="work-item-list">
+        {workItems.map((item) => (
+          <li key={item.id} className="work-item">
+            <div className="work-item-title">{item.title}</div>
+            {item.description && (
+              <div className="work-item-description">{item.description}</div>
+            )}
+            <div className="work-item-status">{item.status}</div>
+          </li>
+        ))}
+        {workItems.length === 0 && !error && (
+          <li className="empty">No work items yet.</li>
+        )}
+      </ul>
+    </div>
+  );
 }
 
-export default App
+export default App;
