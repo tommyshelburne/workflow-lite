@@ -33,3 +33,6 @@ obj/
 
 # Env
 .env
+
+# Claude Code
+CLAUDE.md
