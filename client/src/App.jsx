@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { getWorkItems } from './services/api';
+import { getWorkItems, createWorkItem } from './services/api';
 import './App.css';
 
 function App() {
   const [workItems, setWorkItems] = useState([]);
   const [error, setError] = useState(null);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
 
   useEffect(() => {
     getWorkItems()
@@ -12,9 +14,38 @@ function App() {
       .catch((err) => setError(err.message));
   }, []);
 
+  async function handleCreate(e) {
+    e.preventDefault();
+    try {
+      const newItem = await createWorkItem(title, description);
+      setWorkItems((prev) => [newItem, ...prev]);
+      setTitle('');
+      setDescription('');
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
   return (
     <div className="container">
       <h1>WorkFlow Lite</h1>
+
+      <form className="create-form" onSubmit={handleCreate}>
+        <input
+          type="text"
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Description (optional)"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+        <button type="submit">Add</button>
+      </form>
 
       {error && <p className="error">{error}</p>}
 
